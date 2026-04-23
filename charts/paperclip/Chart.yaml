@@ -1,0 +1,12 @@
+apiVersion: v2
+name: paperclip
+description: Helm chart for Paperclip - open-source AI agent orchestration
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+home: https://github.com/paperclipai/paperclip
+sources:
+  - https://github.com/immodigit/paperclip-helm
+  - https://github.com/immodigit/paperclip-docker
+maintainers:
+  - name: immodigit

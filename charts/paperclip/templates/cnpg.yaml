@@ -1,0 +1,43 @@
+{{- if .Values.cnpg.enabled }}
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ include "paperclip.fullname" . }}-db
+  labels:
+    {{- include "paperclip.labels" . | nindent 4 }}
+spec:
+  instances: {{ .Values.cnpg.instances }}
+  bootstrap:
+    initdb:
+      database: {{ .Values.cnpg.database }}
+      owner: {{ .Values.cnpg.owner }}
+  postgresql:
+    parameters:
+      {{- toYaml .Values.cnpg.postgresql.parameters | nindent 6 }}
+  resources:
+    {{- toYaml .Values.cnpg.resources | nindent 4 }}
+  storage:
+    size: {{ .Values.cnpg.storage.size }}
+  {{- if .Values.cnpg.backup.enabled }}
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: {{ .Values.cnpg.backup.barmanObjectName }}
+  {{- end }}
+---
+{{- if .Values.cnpg.backup.enabled }}
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: {{ include "paperclip.fullname" . }}-db-daily
+spec:
+  schedule: {{ .Values.cnpg.backup.schedule | quote }}
+  backupOwnerReference: self
+  cluster:
+    name: {{ include "paperclip.fullname" . }}-db
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
+{{- end }}
+{{- end }}

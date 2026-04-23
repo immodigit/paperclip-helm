@@ -1,0 +1,73 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/immodigit/paperclip
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 3100
+
+ingress:
+  enabled: false
+  className: traefik
+  annotations: {}
+  hosts:
+    - host: paperclip.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  requests:
+    memory: 512Mi
+  limits:
+    memory: 512Mi
+
+env:
+  PORT: "3100"
+  SERVE_UI: "true"
+  PAPERCLIP_DEPLOYMENT_MODE: "authenticated"
+  PAPERCLIP_DEPLOYMENT_EXPOSURE: "private"
+
+# Reference to an existing secret containing DATABASE_URL, BETTER_AUTH_SECRET
+existingSecret: ""
+
+# CNPG database settings (if using CNPG operator)
+cnpg:
+  enabled: true
+  instances: 1
+  database: paperclip
+  owner: paperclip
+  storage:
+    size: 10Gi
+  resources:
+    requests:
+      memory: 256Mi
+    limits:
+      memory: 256Mi
+  postgresql:
+    parameters:
+      shared_buffers: "64MB"
+      effective_cache_size: "192MB"
+      work_mem: "1MB"
+      maintenance_work_mem: "32MB"
+      random_page_cost: "1.1"
+      effective_io_concurrency: "200"
+      huge_pages: "off"
+  backup:
+    enabled: false
+    schedule: "0 0 2 * * *"
+    barmanObjectName: ""
+
+persistence:
+  enabled: true
+  size: 5Gi
+  storageClass: ""
+  accessMode: ReadWriteOnce
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
