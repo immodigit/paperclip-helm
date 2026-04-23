@@ -5,6 +5,22 @@ image:
   tag: latest
   pullPolicy: Always
 
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Public URL for the Paperclip instance (used for OAuth redirects, links, etc.)
+publicURL: ""
+
+serviceAccount:
+  annotations: {}
+
+podAnnotations: {}
+podLabels: {}
+
+strategy:
+  type: RollingUpdate
+
 service:
   type: ClusterIP
   port: 3100
@@ -32,10 +48,17 @@ env:
   PAPERCLIP_DEPLOYMENT_MODE: "authenticated"
   PAPERCLIP_DEPLOYMENT_EXPOSURE: "private"
 
-# Reference to an existing secret containing DATABASE_URL, BETTER_AUTH_SECRET
+# Additional env vars as list (supports valueFrom)
+extraEnv: []
+
+# envFrom references (ConfigMaps, Secrets)
+envFrom: []
+
+# Reference to an existing secret containing BETTER_AUTH_SECRET.
+# If empty, a secret named <fullname>-secret is expected.
 existingSecret: ""
 
-# CNPG database settings (if using CNPG operator)
+# CNPG database settings
 cnpg:
   enabled: true
   instances: 1
@@ -43,6 +66,7 @@ cnpg:
   owner: paperclip
   storage:
     size: 10Gi
+    storageClass: ""
   resources:
     requests:
       memory: 256Mi
@@ -50,6 +74,7 @@ cnpg:
       memory: 256Mi
   postgresql:
     parameters:
+      # pgtune: web app, 256MB RAM, 1 CPU, SSD, 25 connections
       shared_buffers: "64MB"
       effective_cache_size: "192MB"
       work_mem: "1MB"
@@ -67,6 +92,13 @@ persistence:
   size: 5Gi
   storageClass: ""
   accessMode: ReadWriteOnce
+  existingClaim: ""
+
+networkPolicy:
+  enabled: false
+
+extraVolumes: []
+extraVolumeMounts: []
 
 nodeSelector: {}
 tolerations: []

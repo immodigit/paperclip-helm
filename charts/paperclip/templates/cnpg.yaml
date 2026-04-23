@@ -18,6 +18,9 @@ spec:
     {{- toYaml .Values.cnpg.resources | nindent 4 }}
   storage:
     size: {{ .Values.cnpg.storage.size }}
+    {{- if .Values.cnpg.storage.storageClass }}
+    storageClassName: {{ .Values.cnpg.storage.storageClass | quote }}
+    {{- end }}
   {{- if .Values.cnpg.backup.enabled }}
   plugins:
     - name: barman-cloud.cloudnative-pg.io
@@ -31,6 +34,8 @@ apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
   name: {{ include "paperclip.fullname" . }}-db-daily
+  labels:
+    {{- include "paperclip.labels" . | nindent 4 }}
 spec:
   schedule: {{ .Values.cnpg.backup.schedule | quote }}
   backupOwnerReference: self

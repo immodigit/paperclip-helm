@@ -1,0 +1,26 @@
+Paperclip has been deployed!
+
+1. Get the application URL:
+{{- if .Values.ingress.enabled }}
+{{- range .Values.ingress.hosts }}
+  https://{{ .host }}
+{{- end }}
+{{- else }}
+  kubectl port-forward svc/{{ include "paperclip.fullname" . }} 3100:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+  Then open http://localhost:3100
+{{- end }}
+
+2. Database:
+{{- if .Values.cnpg.enabled }}
+  Using CNPG PostgreSQL cluster: {{ include "paperclip.fullname" . }}-db
+  Connection secret: {{ include "paperclip.fullname" . }}-db-app
+{{- else }}
+  Using external database from secret: {{ .Values.existingSecret }}
+{{- end }}
+
+{{- if .Values.cnpg.backup.enabled }}
+
+3. Backups:
+  Scheduled backup: {{ .Values.cnpg.backup.schedule }}
+  Object store: {{ .Values.cnpg.backup.barmanObjectName }}
+{{- end }}
