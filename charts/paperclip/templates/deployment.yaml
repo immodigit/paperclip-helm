@@ -105,6 +105,13 @@ spec:
             tcpSocket:
               port: http
             periodSeconds: 10
+      {{- with .Values.sidecars }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         - name: data
           {{- if .Values.persistence.enabled }}

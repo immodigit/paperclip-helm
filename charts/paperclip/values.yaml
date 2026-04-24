@@ -97,6 +97,9 @@ persistence:
 networkPolicy:
   enabled: false
 
+sidecars: []
+initContainers: []
+
 extraVolumes: []
 extraVolumeMounts: []
 
